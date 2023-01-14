@@ -1,15 +1,17 @@
 { lib
-, stdenv
 , autoconf
 , automake
+, fetchFromGitHub
+, glib
+, gobject-introspection
+, gtk3
 , intltool
 , libtool
-, fetchFromGitHub
+, python3
+, python310Packages
 , readline
-, gobject-introspection
-, python3Packages
-, gtk3
-, glib
+, stdenv
+, wrapGAppsHook
 }:
 
 stdenv.mkDerivation rec {
@@ -29,19 +31,23 @@ stdenv.mkDerivation rec {
     intltool
     libtool
     gobject-introspection
+    wrapGAppsHook
     ];
 
   buildInputs = [
     readline
     gtk3
-    glib
+    gobject-introspection
+    (python3.withPackages (ps: with ps; [ pygobject3 ]))
   ];
 
-  propagatedBuildInputs = with python3Packages; [
+  propagatedBuildInputs = with python310Packages; [
     pygobject3
+    wrapGAppsHook
   ];
 
-  strictDeps = false; # gobject-introspection does not run with strictDeps (https://github.com/NixOS/nixpkgs/issues/56943)
+  strictDeps = false; # broken with gobject-introspection setup hook https://github.com/NixOS/nixpkgs/issues/56943
+  dontWrapGApps = true; # prevent double wrapping
 
   preConfigure = ''
     ./autogen.sh
@@ -50,7 +56,7 @@ stdenv.mkDerivation rec {
   configureFlags = ["--enable-gui"];
 
   meta = with lib; {
-    homepage = "https://github.com/scanmem/scanmem";
+    homepage = "https://github.com/scanmem/scanmem/tree/master/gui";
     description = "Graphical game cheating tool under Linux, a frontend for scanmem.";
     maintainers = [ ];
     platforms = platforms.linux;
