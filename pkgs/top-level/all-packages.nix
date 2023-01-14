@@ -1367,6 +1367,8 @@ with pkgs;
 
   gam = callPackage ../tools/admin/gam { };
 
+  gameconqueror = callPackage ../tools/misc/gameconqueror { };
+
   gen6dns = callPackage ../tools/networking/gen6dns { };
 
   gfshare = callPackage ../tools/security/gfshare { };
